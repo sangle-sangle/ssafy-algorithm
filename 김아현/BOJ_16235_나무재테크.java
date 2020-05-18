@@ -1,60 +1,51 @@
-import java.util.ArrayList;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.util.Collections;
-import java.util.Comparator;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Scanner;
 
-public class BOJ_16235_³ª¹«ÀçÅ×Å© {
+public class BOJ_16235_ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Å© {
 	static int N, M, K;
 	static int[][] A;
 	static List<Tree> tree;
+	static List<Tree> dtree, newtree;
 	static int[][] food;
 	static int[] di = {-1,-1,-1,0,0,1,1,1};
 	static int[] dj = {-1,0,1,-1,1,-1,0,1};
 	
 	public static void spring() {
-		for (int i = 0; i < tree.size(); i++) {
-			Tree tmp = tree.get(i);
-			if(food[tmp.x][tmp.y]>=tmp.age) {
-				food[tmp.x][tmp.y] = food[tmp.x][tmp.y] - tmp.age;
-				tree.get(i).age++;
+		for(Iterator<Tree> itt = tree.iterator();itt.hasNext();) { // iterator ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+			Tree t = itt.next();
+			if(food[t.x][t.y]>=t.age) {
+				food[t.x][t.y] = food[t.x][t.y] - t.age;
+				t.age++;
 			}else {
-				tree.get(i).age *= -1;
+				dtree.add(t);
+				itt.remove(); // iterator ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È¯ï¿½ß¿ï¿½ ï¿½ï¿½ï¿½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 			}
 		}
 	}
 	public static void summer() {
-		Collections.sort(tree,new Comparator<Tree>() {
-			@Override
-			public int compare(Tree o1, Tree o2) {
-				return o1.age-o2.age;
-			}
-		});	
-		int list_cut = tree.size();
-		for (int i = 0; i < tree.size(); i++) {
-			Tree tmp = tree.get(i);
-			if(tmp.age>0) {
-				list_cut = i;
-				break;
-			}else {
-				food[tmp.x][tmp.y] += (-1*tmp.age)/2;
-			}
+		for(Tree t:dtree) {
+			food[t.x][t.y] += t.age/2;
 		}
-		tree = tree.subList(list_cut, tree.size());
+		dtree.clear();
 	}
 	public static void fall() {
-		for (int i = 0; i < tree.size(); i++) {
-			Tree tmp = tree.get(i);
-			if(tmp.age%5==0) {
+		for(Tree t:tree) {
+			if(t.age%5==0) {
 				for (int d = 0; d < 8; d++) {
-					int ni = tmp.x + di[d];
-					int nj = tmp.y + dj[d];
+					int ni = t.x + di[d];
+					int nj = t.y + dj[d];
 					if(!isOut(ni,nj)) {
-						tree.add(new Tree(ni,nj,1));
+						newtree.add(new Tree(ni,nj,1));
 					}
 				}
 			}
 		}
+		tree.addAll(0, newtree);
+		newtree.clear();
 	}
 	public static void winter() {
 		for (int i = 0; i < N; i++) {
@@ -70,37 +61,42 @@ public class BOJ_16235_³ª¹«ÀçÅ×Å© {
 		}else return false;
 	}
 	
-	public static void main(String[] args) {
-		Scanner sc = new Scanner(System.in);
-		N = sc.nextInt();
-		M = sc.nextInt(); // M°³ÀÇ ³ª¹«
-		K = sc.nextInt(); // K³âÀÌ Áö³­ ÈÄ »ì¾ÆÀÖ´Â ³ª¹« °³¼ö ±¸ÇÏ±â
+	public static void main(String[] args) throws Exception {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		String str = br.readLine();
+		String[] strArr = str.split(" ");
+		
+		N = Integer.parseInt(strArr[0]);
+		M = Integer.parseInt(strArr[1]); // Mï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+		K = Integer.parseInt(strArr[2]); // Kï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ö´ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ï±ï¿½
 		
 		A = new int[N][N];
 		food = new int[N][N];
 		
 		for (int i = 0; i < N; i++) {
+			str = br.readLine();
+			strArr = str.split(" ");
 			for (int j = 0; j < N; j++) {
-				A[i][j] = sc.nextInt();
+				A[i][j] = Integer.parseInt(strArr[j]);
 				food[i][j] = 5;
 			}
 		}
 		
-		tree = new ArrayList<>();
+		tree = new LinkedList<>();
+		dtree = new LinkedList<>();
+		newtree = new LinkedList<>();
 		
 		for (int i = 0; i < M; i++) {
-			int x = sc.nextInt();
-			int y = sc.nextInt();
-			int z = sc.nextInt();
+			str = br.readLine();
+			strArr = str.split(" ");
+			int x = Integer.parseInt(strArr[0]);
+			int y = Integer.parseInt(strArr[1]);
+			int z = Integer.parseInt(strArr[2]);
 			
 			tree.add(new Tree(x-1,y-1,z));
 		}
-		Collections.sort(tree,new Comparator<Tree>() {
-			@Override
-			public int compare(Tree o1, Tree o2) {
-				return o1.age-o2.age;
-			}
-		});		
+		
+		Collections.sort(tree);
 		
 		for (int i = 0; i < K; i++) {
 			spring();
@@ -109,18 +105,10 @@ public class BOJ_16235_³ª¹«ÀçÅ×Å© {
 			winter();
 		}
 		
-		int ans = 0;
-		
-		for (int i = 0; i < tree.size(); i++) {
-			if(tree.get(i).age>0) {
-				ans++;
-			}
-		}
-		
-		System.out.println(ans);
+		System.out.println(tree.size());
 	}
 	
-	public static class Tree{
+	public static class Tree implements Comparable<Tree>{
 		int x;
 		int y;
 		int age;
@@ -132,6 +120,11 @@ public class BOJ_16235_³ª¹«ÀçÅ×Å© {
 			this.x = x;
 			this.y = y;
 			age = z;
+		}
+
+		@Override
+		public int compareTo(Tree o) {
+			return this.age-o.age;
 		}
 	}
 }
