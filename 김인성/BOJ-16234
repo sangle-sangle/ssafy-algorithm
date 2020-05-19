@@ -1,0 +1,34 @@
+n, l, r = map(int, input().split())
+board = [list(map(int, input().split())) for _ in range(n)]
+dx = [1, -1, 0, 0]
+dy = [0, 0, 1, -1]
+flag = True
+answer = 0
+while flag:
+    flag = False
+    used = [[False] * n for _ in range(n)]
+    for j in range(n):
+        for i in range(n):
+            if not used[j][i]:
+                used[j][i] = True
+                union, val = [(i, j)], board[j][i]
+                for contry in union:
+                    x0, y0 = contry
+                    people = board[y0][x0]
+                    for k in range(4):
+                        x, y = x0 + dx[k], y0 + dy[k]
+                        if 0 <= x < n and 0 <= y < n:
+                            if not used[y][x] and l <= abs(people - board[y][x]) <= r:
+                                used[y][x] = True
+                                val += board[y][x]
+                                union.append((x, y))
+                                flag = True
+                val //= len(union)
+                for contry in union:
+                    x, y = contry
+                    board[y][x] = val
+    if flag:
+        answer += 1
+    else:
+        break
+print(answer)
